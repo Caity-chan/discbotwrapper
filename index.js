@@ -45,7 +45,23 @@ command.permissions.add = (name, perms) => {
 }
 command.permissions.set = (name, perms) => {
 	permissions[name] = perms;
-} 
+}
+
+ban = async ({guild, user, delete_days, reason}) => {
+	if (!delete_days) delete_days = 7;
+	if (!reason) reason = 'No reason provided.'
+	await axios.post(`https://discord.com/api/guilds/${guild}/bans/${user}`,
+		{
+			'delete_message_days': delete_days,
+			'reason': reason
+		}
+		,
+		{headers: {
+			"Authorization": `Bot ${token}`
+		}}
+	)
+}
+
 modify_status = (arr) => {
 	for (const [key, value] of arr) {
 		switch (key) {
@@ -140,3 +156,4 @@ module.exports.send_message = send_message;
 module.exports.modify_status = modify_status;
 module.exports.login = login;
 module.exports.command = command;
+module.exports.ban = ban;
