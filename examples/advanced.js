@@ -1,4 +1,4 @@
-startup_channel = '721386058385719406';
+startup_channel = '';
 
 const { event, send_message, modify_status, login, command, ban, getroles, kick } = require('./utils');
 const axios = require('axios');
