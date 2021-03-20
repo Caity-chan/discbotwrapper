@@ -172,7 +172,7 @@ command.create('warn', async (message, args) => {
 command.create('addperm', async (message, args) => {
 	
 	const permissions = JSON.parse(fs.readFileSync('./permissions.json').toString());
-	if (!message.author.id === '585960267741921281' || !message.author.id === '585960267741921281') return await send_message({
+	if (!message.author.id === '' || !message.author.id === '') return await send_message({
 		message: 'You are not the bot owner/server owner!',
 		channel: message.channel_id,
 		tts: false
@@ -187,7 +187,7 @@ command.create('addperm', async (message, args) => {
 });
 command.create('delperm', async (message, args) => {
 	const permissions = JSON.parse(fs.readFileSync('./permissions.json').toString());
-	if (!message.author.id === '585960267741921281' || !message.author.id === '585960267741921281') return await send_message({
+	if (!message.author.id === '' || !message.author.id === '') return await send_message({
 		message: 'You are not the bot owner/server owner!',
 		channel: message.channel_id,
 		tts: false
