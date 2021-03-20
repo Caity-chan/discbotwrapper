@@ -15,9 +15,7 @@ const status_stuff = {
 		"afk": false
 	}
 }
-
-//let start = () => {};
-//let message_event = () => {};
+const roles = {};
 const event = {};
 const events = {};
 event.create = (name, func) => {
@@ -47,21 +45,49 @@ command.permissions.set = (name, perms) => {
 	permissions[name] = perms;
 }
 
+getroles = async (guild_id) => {
+	try {
+		response = await axios.get(`https://discord.com/api/v8/guilds/${guild_id}/roles`,
+			{headers: {
+				"Authorization": `Bot ${token}`,
+				"Content-Type": "application/json"
+			}}
+		)
+	} catch (err) {
+		console.log(err.response.data);
+	}
+	
+	return response.data;
+}
 ban = async ({guild, user, delete_days, reason}) => {
 	if (!delete_days) delete_days = 7;
-	if (!reason) reason = 'No reason provided.'
-	await axios.post(`https://discord.com/api/guilds/${guild}/bans/${user}`,
+	if (!reason) reason = 'No reason provided.';
+	await axios.put(`https://discord.com/api/guilds/${guild}/bans/${user}`,
 		{
 			'delete_message_days': delete_days,
 			'reason': reason
 		}
 		,
 		{headers: {
-			"Authorization": `Bot ${token}`
+			"Authorization": `Bot ${token}`,
+			"Content-Type": 'application/json'
 		}}
-	)
+	);
 }
-
+kick = async ({guild, user, reason}) => {
+	if (!reason) reason = 'No reason provided.';
+	await axios.delete(`https://discord.com/api/guilds/${guild}/members/${user}`,
+		{
+			'reason': reason
+		},
+		{
+			headers: {
+				"Authorization": `Bot ${token}`,
+				"Content-Type": 'application/json'
+			}
+		}
+	);
+}
 modify_status = (arr) => {
 	for (const [key, value] of arr) {
 		switch (key) {
@@ -140,7 +166,6 @@ login = async (tkn) => {
 			} else {
 			}
 		} else {
-			//console.log(_event);
 			if (events[_event]) events[_event](data.d);
 			
 		}
@@ -157,3 +182,5 @@ module.exports.modify_status = modify_status;
 module.exports.login = login;
 module.exports.command = command;
 module.exports.ban = ban;
+module.exports.kick = kick;
+module.exports.getroles = getroles;
