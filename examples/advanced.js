@@ -22,7 +22,11 @@ event.create('READY', async () => {
 command.prefix('m.')
 
 command.create('ban', async (message, args) => {
-	const permissions = JSON.parse(fs.readFileSync('./permissions.json').toString());
+	try {
+		const permissions = JSON.parse(fs.readFileSync('./permissions.json').toString());
+	} catch (err) {
+		const permissions = {};
+	}
 	check = [];
 	for (const role of message.member.roles) {
 		console.log(role);
@@ -60,7 +64,11 @@ command.create('ban', async (message, args) => {
 	});
 });
 command.create('kick', async (message, args) => {
-	const permissions = JSON.parse(fs.readFileSync('./permissions.json').toString());
+	try {
+		const permissions = JSON.parse(fs.readFileSync('./permissions.json').toString());
+	} catch (err) {
+		const permissions = {};
+	}
 	check = [];
 	for (const role of message.member.roles) {
 		if (!permissions[role]) check.push(false);
@@ -97,8 +105,17 @@ command.create('kick', async (message, args) => {
 });
 
 command.create('warn', async (message, args) => {
-	const permissions = JSON.parse(fs.readFileSync('./permissions.json').toString());
-	const warns = JSON.parse(fs.readFileSync('./warns.json').toString());
+	try {
+		const permissions = JSON.parse(fs.readFileSync('./permissions.json').toString());
+	} catch (err) {
+		const permissions = {};
+	}
+	try {
+		const warns = JSON.parse(fs.readFileSync('./warns.json').toString());
+	} catch (err) {
+		const warns = {};
+	}
+	
 	check = [];
 	for (const role of message.member.roles) {
 		if (!permissions[role]) check.push(false);
@@ -171,7 +188,11 @@ command.create('warn', async (message, args) => {
 
 command.create('addperm', async (message, args) => {
 	
-	const permissions = JSON.parse(fs.readFileSync('./permissions.json').toString());
+	try {
+		const permissions = JSON.parse(fs.readFileSync('./permissions.json').toString());
+	} catch (err) {
+		const permissions = {};
+	}
 	if (!message.author.id === '' || !message.author.id === '') return await send_message({
 		message: 'You are not the bot owner/server owner!',
 		channel: message.channel_id,
@@ -186,7 +207,12 @@ command.create('addperm', async (message, args) => {
 	});
 });
 command.create('delperm', async (message, args) => {
-	const permissions = JSON.parse(fs.readFileSync('./permissions.json').toString());
+	try {
+		const permissions = JSON.parse(fs.readFileSync('./permissions.json').toString());
+	} catch (err) {
+		const permissions = {};
+	}
+	
 	if (!message.author.id === '' || !message.author.id === '') return await send_message({
 		message: 'You are not the bot owner/server owner!',
 		channel: message.channel_id,
