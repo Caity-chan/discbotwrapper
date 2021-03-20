@@ -115,7 +115,6 @@ command.create('warn', async (message, args) => {
 	} catch (err) {
 		const warns = {};
 	}
-	
 	check = [];
 	for (const role of message.member.roles) {
 		if (!permissions[role]) check.push(false);
