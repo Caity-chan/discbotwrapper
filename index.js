@@ -193,6 +193,10 @@ login = async (tkn) => {
 			
 		}
 	});
+    ws.on('close', async (code, message) => {
+        console.log(`Closed because: ${code} and maybe ${message}`);
+        if (code === 1001) await login(token, [], iV)
+    });
 } 
 	
 
