@@ -15,6 +15,15 @@ const status_stuff = {
 		"afk": false
 	}
 }
+
+timeout = ms => {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+sleep = async (tio, fn, ...args) => {
+    await timeout(tio);
+    return fn(...args);
+}
+
 const roles = {};
 const event = {};
 const events = {};
@@ -130,7 +139,21 @@ send_message = async ({message, tts, channel, embed}) => {
 			
 	)
 }
-
+edit_message = async ({channel, message, embed}) => {
+	
+	data = {
+			"content": message.content,
+		}
+	if (embed) data.embed = embed;
+	await axios.patch(`https://discord.com/api/channels/${channel}/messages/${message.id}`,
+		data
+		,
+		{headers: {
+			"Authorization": `Bot ${token}`
+		}}
+			
+	)
+}
 login = async (tkn) => {
 	token = tkn;
 	ws = new WebSocket('wss://gateway.discord.gg/?v=6&encoding=json');
@@ -173,14 +196,30 @@ login = async (tkn) => {
 } 
 	
 
-
+	
+react = async ({message, channel, emoji}) => {
+	await sleep(250, async () => { 
+		console.log(message, channel, emoji);
+		console.log(encodeURI(emoji))
+		await axios.put(`https://discord.com/api/channels/${channel}/messages/${message}/reactions/${encodeURI(emoji)}/@me`, {},
+			{headers: {
+				"Authorization": `Bot ${token}`,
+				"Content-Type": 'application/json'
+			}}
+		);
+	});
+}
 
 
 module.exports.event = event;
 module.exports.send_message = send_message;
+module.exports.edit_message = edit_message;
 module.exports.modify_status = modify_status;
 module.exports.login = login;
 module.exports.command = command;
 module.exports.ban = ban;
 module.exports.kick = kick;
 module.exports.getroles = getroles;
+module.exports.sleep = sleep;
+module.exports.timeout = timeout;
+module.exports.react = react;
