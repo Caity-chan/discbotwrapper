@@ -3,6 +3,7 @@ const WebSocket = require('ws');
 let token;
 let ws;
 let prefix;
+let handle;
 const status_stuff = {
 	"op": 3,
 	"d": {
@@ -55,16 +56,14 @@ command.permissions.set = (name, perms) => {
 }
 
 getroles = async (guild_id) => {
-	try {
-		response = await axios.get(`https://discord.com/api/v8/guilds/${guild_id}/roles`,
-			{headers: {
-				"Authorization": `Bot ${token}`,
-				"Content-Type": "application/json"
-			}}
-		)
-	} catch (err) {
-		console.log(err.response.data);
-	}
+	response = await axios.get(`https://discord.com/api/v8/guilds/${guild_id}/roles`,
+		{headers: {
+			"Authorization": `Bot ${token}`,
+			"Content-Type": "application/json"
+		}}
+	).catch(async err => {
+		await handle({func: getroles, err, args: {guild_id}});
+	});
 	
 	return response.data;
 }
@@ -81,7 +80,9 @@ ban = async ({guild, user, delete_days, reason}) => {
 			"Authorization": `Bot ${token}`,
 			"Content-Type": 'application/json'
 		}}
-	);
+	).catch(async err => {
+		await handle({func: ban, err, args: {guild, user, delete_days, reason}});
+	});
 }
 kick = async ({guild, user, reason}) => {
 	if (!reason) reason = 'No reason provided.';
@@ -95,7 +96,9 @@ kick = async ({guild, user, reason}) => {
 				"Content-Type": 'application/json'
 			}
 		}
-	);
+	).catch(async err => {
+		await handle({func: kick, err, args: {guild, user, reason}});
+	});
 }
 modify_status = (arr) => {
 	for (const [key, value] of arr) {
@@ -136,8 +139,9 @@ send_message = async ({message, tts, channel, embed}) => {
 		{headers: {
 			"Authorization": `Bot ${token}`
 		}}
-			
-	)
+	).catch(async err => {
+		await handle({func: send_message, err, args: {message, tts, channel, embed}});
+	});
 }
 edit_message = async ({channel, message, embed}) => {
 	
@@ -151,8 +155,9 @@ edit_message = async ({channel, message, embed}) => {
 		{headers: {
 			"Authorization": `Bot ${token}`
 		}}
-			
-	)
+	).catch(async err => {
+		await handle({func: edit_message, err, args: {channel, message, embed}});
+	});
 }
 login = async (tkn) => {
 	token = tkn;
@@ -202,19 +207,25 @@ login = async (tkn) => {
 
 	
 react = async ({message, channel, emoji}) => {
-	await sleep(250, async () => { 
-		console.log(message, channel, emoji);
-		console.log(encodeURI(emoji))
-		await axios.put(`https://discord.com/api/channels/${channel}/messages/${message}/reactions/${encodeURI(emoji)}/@me`, {},
-			{headers: {
-				"Authorization": `Bot ${token}`,
-				"Content-Type": 'application/json'
-			}}
-		);
+	console.log(message, channel, emoji);
+	console.log(encodeURI(emoji))
+	await axios.put(`https://discord.com/api/channels/${channel}/messages/${message}/reactions/${encodeURI(emoji)}/@me`, {},
+		{headers: {
+			"Authorization": `Bot ${token}`,
+			"Content-Type": 'application/json'
+		}}
+	).catch(async err => {
+		await handle({func: react, err, args: {message, channel, emoji}});
 	});
 }
 
-
+handle = async ({func, err, args}) => {
+	if (err.response.status === 429) {
+		await sleep(err.response.data.retry_after, async () => {
+			await func(args);
+		});
+	}
+}
 module.exports.event = event;
 module.exports.send_message = send_message;
 module.exports.edit_message = edit_message;
