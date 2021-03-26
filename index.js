@@ -4,6 +4,8 @@ let token;
 let ws;
 let prefix;
 let handle;
+let iV;
+Intents = ["GUILDS", "GUILD_MEMBERS", "GUILD_BANS", "GUILD_EMOJIS", "GUILD_INTEGRATIONS", "GUILD_WEBHOOKS", "GUILD_INVITES", "GUILD_VOICE_STATES", "GUILD_PRESENCES", "GUILD_MESSAGES", "GUILD_MESSAGE_REACTIONS", "GUILD_MESSAGE_TYPING", "DIRECT_MESSAGE_REACTIONS", "DIRECT_MESSAGE_TYPING"];
 const status_stuff = {
 	"op": 3,
 	"d": {
@@ -16,7 +18,15 @@ const status_stuff = {
 		"afk": false
 	}
 }
-
+calcIntents = async (wantedIntents) => {
+	let intentValues = 0;
+	for (const intent of wantedIntents) {
+		index = Intents.indexOf(intent);
+		value = power(2, index);
+		intentValues += value;
+	}
+	return intentValues;
+}
 timeout = ms => {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -159,7 +169,12 @@ edit_message = async ({channel, message, embed}) => {
 		await handle({func: edit_message, err, args: {channel, message, embed}});
 	});
 }
-login = async (tkn) => {
+login = async (tkn, intents, intentValue) => {
+	if (intents) {
+		if (intents[0]) iV = await calcIntents(intents);
+		else if (intentValue) iV = intentValue;
+		else iV = 513;
+	} else iV = 513;
 	token = tkn;
 	ws = new WebSocket('wss://gateway.discord.gg/?v=6&encoding=json');
 	let interval_set = false;
@@ -181,7 +196,7 @@ login = async (tkn) => {
 							"op": 2,
 							"d": {
 								"token": "${token}",
-								"intents": 513,
+								"intents": ${iV},
 								"properties": {
 									"$os": "linux",
 									"$browser": "my_library",
@@ -238,3 +253,5 @@ module.exports.getroles = getroles;
 module.exports.sleep = sleep;
 module.exports.timeout = timeout;
 module.exports.react = react;
+module.exports.Intents = Intents;
+module.exports.calcIntents = calcIntents;
