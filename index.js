@@ -215,7 +215,7 @@ login = async (tkn, intents, intentValue) => {
 	});
     ws.on('close', async (code, message) => {
         console.log(`Closed because: ${code} and maybe ${message}`);
-        if (code === 1001) await login(token, [], iV)
+        if (code === 1001 || code === 1006) await login(token, [], iV)
     });
 } 
 	
